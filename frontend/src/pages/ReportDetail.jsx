@@ -4,9 +4,11 @@ import { api } from '../api';
 import { useAuth } from '../AuthContext';
 import { formatDate } from '../constants';
 import { useDocumentTitle, useFetch } from '../hooks';
+import { tiltHandlers } from '../tilt';
 import FormField from '../components/FormField';
 import { StatusBadge, TypeBadge } from '../components/Badges';
 import { Alert, ErrorState, Flash, Loading } from '../components/Feedback';
+import { IconArrowLeft, IconBox, IconCalendar, IconEdit, IconGrid, IconPin } from '../components/Icons';
 
 function ClaimForm({ reportId, onDone }) {
   const [evidence, setEvidence] = useState('');
@@ -36,7 +38,7 @@ function ClaimForm({ reportId, onDone }) {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="card">
+    <form onSubmit={submit} noValidate className="panel">
       <h2>Claim this item</h2>
       {formError && <Alert>{formError}</Alert>}
       <FormField id="evidence" label="Why does it belong to you?" as="textarea" rows={4} required value={evidence}
@@ -68,7 +70,7 @@ export default function ReportDetail() {
   else if (isOwner) claimArea = <Alert kind="info">You reported this item as found, so you cannot claim it.</Alert>;
   else if (isAdmin) claimArea = null;
   else if (claim) claimArea = (
-    <div className="card">
+    <div className="panel">
       <h2>Your claim</h2>
       <p><StatusBadge status={claim.status} /></p>
       {claim.admin_reason && <p><strong>Administrator response:</strong> {claim.admin_reason}</p>}
@@ -79,32 +81,48 @@ export default function ReportDetail() {
   else claimArea = <ClaimForm reportId={r.id} onDone={reload} />;
 
   return (
-    <article>
-      <Flash />
-      <p><Link to="/">← Back to items</Link></p>
-      <div className="badges"><TypeBadge type={r.type} /><StatusBadge status={r.status} /></div>
-      <h1>{r.title}</h1>
-      {r.photo_url && <img src={r.photo_url} alt={`Photo of ${r.title}`} className="detail-photo" />}
-      <dl className="facts">
-        <div><dt>Category</dt><dd>{r.category}</dd></div>
-        <div><dt>Campus location</dt><dd>{r.location}</dd></div>
-        <div><dt>{r.type === 'found' ? 'Date found' : 'Date lost'}</dt><dd>{formatDate(r.event_date)}</dd></div>
-      </dl>
-      <h2>Description</h2>
-      <p className="prose">{r.description}</p>
-
-      {r.private_details && (isOwner || isAdmin) && (
-        <div className="private-box">
-          <h2>Private identifying details</h2>
-          <p className="hint">Only you and the administrator can see this.</p>
-          <p className="prose">{r.private_details}</p>
+    <>
+      <section className="page-hero">
+        <div className="page-hero-inner">
+          <div>
+            <Link to="/items" className="back-link"><IconArrowLeft size={16} /> Back to items</Link>
+            <div className="badges"><TypeBadge type={r.type} /><StatusBadge status={r.status} /></div>
+            <h1>{r.title}</h1>
+          </div>
         </div>
-      )}
+      </section>
+      <article className="overlap detail">
+        <Flash />
+        <div className="detail-grid">
+          <div className="detail-media tilt-3d" {...tiltHandlers(5)}>
+            {r.photo_url
+              ? <img src={r.photo_url} alt={`Photo of ${r.title}`} className="detail-photo" />
+              : <div className="detail-photo detail-photo-empty" role="img" aria-label="No photo provided"><IconBox size={56} /></div>}
+          </div>
+          <div className="detail-info panel">
+            <dl className="facts">
+              <div><dt><IconGrid size={15} /> Category</dt><dd>{r.category}</dd></div>
+              <div><dt><IconPin size={15} /> Campus location</dt><dd>{r.location}</dd></div>
+              <div><dt><IconCalendar size={15} /> {r.type === 'found' ? 'Date found' : 'Date lost'}</dt><dd>{formatDate(r.event_date)}</dd></div>
+            </dl>
+            <h2>Description</h2>
+            <p className="prose">{r.description}</p>
 
-      {isOwner && r.status === 'open' && (
-        <p><Link to={`/reports/${r.id}/edit`} className="btn btn-secondary">Edit report</Link></p>
-      )}
-      {claimArea}
-    </article>
+            {r.private_details && (isOwner || isAdmin) && (
+              <div className="private-box">
+                <h2>Private identifying details</h2>
+                <p className="hint">Only you and the administrator can see this.</p>
+                <p className="prose">{r.private_details}</p>
+              </div>
+            )}
+
+            {isOwner && r.status === 'open' && (
+              <p><Link to={`/reports/${r.id}/edit`} className="btn btn-soft"><IconEdit size={18} /> Edit report</Link></p>
+            )}
+          </div>
+        </div>
+        {claimArea}
+      </article>
+    </>
   );
 }

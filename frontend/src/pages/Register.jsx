@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import FormField from '../components/FormField';
+import PageHeader from '../components/PageHeader';
+import { IconLock, IconMail, IconUser, IconUserPlus } from '../components/Icons';
 
 export default function Register() {
   const { register } = useAuth();
@@ -45,8 +47,9 @@ export default function Register() {
   }
 
   return (
-    <section className="card narrow">
-      <h1>Create your account</h1>
+    <>
+      <PageHeader icon={IconUserPlus} title="Create your account" subtitle="One account to report items and claim yours." />
+    <section className="card narrow overlap">
       {formError && (
         <p role="alert" className="alert alert-error">
           {formError}
@@ -55,7 +58,9 @@ export default function Register() {
       <form onSubmit={handleSubmit} noValidate>
         <FormField
           id="full_name"
+          required
           label="Full name"
+          icon={IconUser}
           autoComplete="name"
           value={form.full_name}
           onChange={update}
@@ -63,7 +68,9 @@ export default function Register() {
         />
         <FormField
           id="email"
+          required
           label="Email address"
+          icon={IconMail}
           type="email"
           autoComplete="email"
           value={form.email}
@@ -72,7 +79,9 @@ export default function Register() {
         />
         <FormField
           id="password"
+          required
           label="Password"
+          icon={IconLock}
           type="password"
           autoComplete="new-password"
           hint="At least 8 characters."
@@ -88,5 +97,6 @@ export default function Register() {
         Already registered? <Link to="/login">Log in</Link>
       </p>
     </section>
+    </>
   );
 }

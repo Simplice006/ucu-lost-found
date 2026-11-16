@@ -7,8 +7,9 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) return <p role="status">Loading your account…</p>;
-  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (loading) return <p role="status" className="loading">Loading your account…</p>;
+  // Keep the query string so "Report Lost" / "Report Found" come back to the right form after login.
+  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/" replace />;
   return children;
 }
