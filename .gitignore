@@ -1,0 +1,13 @@
+# Secrets: NEVER commit these (exam rule)
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+
+# Logs and OS files
+*.log
+.DS_Store
