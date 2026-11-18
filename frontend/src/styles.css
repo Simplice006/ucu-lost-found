@@ -1,27 +1,27 @@
 /* UCU Lost & Found — dark purple theme. Mobile-first. Text colours keep WCAG AA contrast. */
 :root {
-  --night: #140a2b;
-  --night-2: #24114a;
-  --primary: #5b21b6;
-  --primary-dark: #4a1a96;
-  --accent: #7c3aed;
-  --accent-text: #c9a4ff;       /* purple words on dark backgrounds */
-  --lavender: #f4f0fc;
-  --lavender-2: #ece5fa;
+   --night: #0b1a33;
+  --night-2: #12284d;
+  --primary: #1d4ed8;
+  --primary-dark: #1e3a8a;
+  --accent: #f97316;
+  --accent-text: #93c5fd;       /* light blue words on dark backgrounds */
+  --lavender: #eff6ff;
+  --lavender-2: #dbeafe;
   --ink: #1b1530;
   --muted: #544d6b;
-  --bg: #f4f0fc;
+  --bg: #eff6ff;
   --surface: #ffffff;
-  --line: #ddd6ee;
-  --field-line: #cfc6e6;
+  --line: #d3deef;
+  --field-line: #bfcce4;
   --error: #a4161a;
   --error-bg: #fdecec;
   --success: #11633a;
   --success-bg: #e8f8ee;
-  --focus: #0a58ca;
+  --focus: #f97316;
   --radius: 16px;
-  --shadow: 0 10px 30px rgba(45, 14, 100, 0.10);
-  --shadow-lg: 0 24px 60px rgba(45, 14, 100, 0.20);
+  --shadow: 0 10px 30px rgba(11, 26, 51, 0.12);
+  --shadow-lg: 0 24px 60px rgba(11, 26, 51, 0.25);
   --maxw: 80rem;
 }
 
