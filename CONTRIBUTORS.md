@@ -1,2 +1,2 @@
 # Contributors
-- Gloria Asifiwe
+- Gloria Asifiwe- Patience Baguma
