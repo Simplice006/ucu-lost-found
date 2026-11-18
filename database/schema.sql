@@ -1,5 +1,11 @@
--- UCU Campus Lost-and-Found: database schema (MySQL 8 / TiDB MySQL-compatible)
--- Run this file once on an empty database. It is safe to re-run (DROP IF EXISTS).
+-- UCU Campus Lost-and-Found: database schema (MySQL 5.7+/8, MariaDB 10.2+, TiDB MySQL-compatible)
+-- Run it with:  npm run db:init   (inside /backend, reads your .env)   -- or --
+--               mysql -u root -p < database/schema.sql
+-- It creates the database if needed and RE-CREATES the tables: re-running it ERASES the data in them.
+-- TiDB Cloud: if your user may not create databases, delete the next two statements and run the rest in your database.
+
+CREATE DATABASE IF NOT EXISTS ucu_lost_found CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ucu_lost_found;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS claims;
@@ -15,7 +21,7 @@ CREATE TABLE users (
   password_hash VARCHAR(255) NOT NULL,            -- bcrypt hash, never plain text
   role          ENUM('student','admin') NOT NULL DEFAULT 'student',
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Server-side sessions: logging out DELETES the row, so the token stops working at once.
 CREATE TABLE sessions (
@@ -25,7 +31,7 @@ CREATE TABLE sessions (
   expires_at  DATETIME NOT NULL,
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE reports (
   id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +53,7 @@ CREATE TABLE reports (
   INDEX idx_location (location),
   INDEX idx_event_date (event_date),
   INDEX idx_status (status)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE claims (
   id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -68,4 +74,4 @@ CREATE TABLE claims (
   FOREIGN KEY (reviewed_by) REFERENCES users(id),
   INDEX idx_claim_report (report_id),
   INDEX idx_claim_claimant (claimant_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
