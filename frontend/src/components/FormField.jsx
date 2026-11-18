@@ -1,5 +1,5 @@
 // A labelled input, textarea or select. Errors and hints are linked for screen readers.
-export default function FormField({ id, label, error, hint, as = 'input', required, children, ...props }) {
+export default function FormField({ id, label, error, hint, as = 'input', required, icon: Icon, children, ...props }) {
   const errorId = `${id}-error`;
   const hintId = `${id}-hint`;
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ');
@@ -7,7 +7,8 @@ export default function FormField({ id, label, error, hint, as = 'input', requir
   return (
     <div className="field">
       <label htmlFor={id}>
-        {label}
+        {Icon && <Icon size={16} className="label-icon" />}
+        <span>{label}</span>
         {required ? <span className="req"> (required)</span> : <span className="opt"> (optional)</span>}
       </label>
       {hint && <p id={hintId} className="hint">{hint}</p>}

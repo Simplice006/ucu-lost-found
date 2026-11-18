@@ -6,6 +6,8 @@ import { useDocumentTitle, useFetch } from '../hooks';
 import FormField from '../components/FormField';
 import { StatusBadge } from '../components/Badges';
 import { Alert, EmptyState, ErrorState, Loading } from '../components/Feedback';
+import PageHeader from '../components/PageHeader';
+import { IconShield } from '../components/Icons';
 
 function ClaimReview({ claim, onChanged }) {
   const [reason, setReason] = useState('');
@@ -37,9 +39,9 @@ function ClaimReview({ claim, onChanged }) {
   }
 
   return (
-    <li className="item"><div className="item-body">
+    <li className="panel">
       <div className="badges"><StatusBadge status={claim.returned_at ? 'returned' : claim.status} /></div>
-      <h2 className="item-title"><Link to={`/reports/${claim.report_id}`}>{claim.report_title}</Link></h2>
+      <h2 className="panel-title"><Link to={`/reports/${claim.report_id}`}>{claim.report_title}</Link></h2>
       <p className="meta">Claimed by {claim.claimant_name} on {formatDate(claim.created_at)}</p>
       <p><strong>Claimant evidence:</strong> {claim.evidence}</p>
       {claim.private_details && <p><strong>Private details on file:</strong> {claim.private_details}</p>}
@@ -64,13 +66,13 @@ function ClaimReview({ claim, onChanged }) {
               onClick={() => run(`/api/admin/claims/${claim.id}/confirm-return`, {}, 'Return confirmed. The item is now marked as returned.')}>
               {busy ? 'Saving…' : 'Yes, mark as returned'}
             </button>
-            <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>Not yet</button>
+            <button type="button" className="btn btn-soft" onClick={() => setConfirming(false)}>Not yet</button>
           </div>
         ) : (
           <button type="button" className="btn btn-primary" onClick={() => setConfirming(true)}>Confirm item collected</button>
         )
       )}
-    </div></li>
+    </li>
   );
 }
 
@@ -83,12 +85,13 @@ export default function AdminClaims() {
   const tabs = [['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected'], ['all', 'All']];
 
   return (
-    <section>
-      <h1>Review claims</h1>
+    <>
+      <PageHeader icon={IconShield} title="Review claims" subtitle="Compare each claim with the private details on file, then decide." />
+      <section className="overlap">
       <div role="group" aria-label="Filter claims by status" className="tabs">
         {tabs.map(([value, label]) => (
           <button key={value} type="button" aria-pressed={filter === value}
-            className={`btn ${filter === value ? 'btn-primary' : 'btn-secondary'}`}
+            className={`btn btn-pill-tab ${filter === value ? 'is-on' : ''}`}
             onClick={() => { setFilter(value); setFlash(''); }}>{label}</button>
         ))}
       </div>
@@ -98,10 +101,11 @@ export default function AdminClaims() {
       {!loading && !error && (claims.length === 0 ? (
         <EmptyState title="No claims here"><p>There are no {filter === 'all' ? '' : filter} claims to show.</p></EmptyState>
       ) : (
-        <ul className="item-list single">
+        <ul className="stack">
           {claims.map((c) => <ClaimReview key={c.id} claim={c} onChanged={(msg) => { setFlash(msg); reload(); }} />)}
         </ul>
       ))}
-    </section>
+      </section>
+    </>
   );
 }

@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
-import { CATEGORIES, LOCATIONS, todayISO } from '../constants';
+import { CATEGORIES, todayISO } from '../constants';
+import LocationOptions from '../components/LocationOptions';
 import { useDocumentTitle, useFetch } from '../hooks';
 import FormField from '../components/FormField';
 import { Alert, ErrorState, Loading } from '../components/Feedback';
+import PageHeader from '../components/PageHeader';
+import { IconCalendar, IconEdit, IconGrid, IconPin, IconTag } from '../components/Icons';
 
 const BLANK = { type: 'lost', title: '', category: '', description: '', private_details: '', event_date: '', location: '', photo_url: '' };
 
@@ -73,18 +76,23 @@ export default function ReportForm() {
   if (editing && existing.error) return <ErrorState message={existing.error} onRetry={existing.reload} />;
 
   return (
-    <section className="card narrow-lg">
-      <h1>{editing ? 'Edit your report' : 'Report an item'}</h1>
+    <>
+      <PageHeader icon={IconEdit}
+        title={editing ? 'Edit your report' : form.type === 'found' ? 'Report a found item' : 'Report a lost item'}
+        subtitle="The more precise you are, the faster the item finds its owner." />
+    <section className="card narrow-lg overlap">
       {formError && <Alert>{formError}</Alert>}
       <form onSubmit={submit} noValidate>
         <fieldset className="field">
           <legend>What happened?</legend>
-          <label className="choice"><input type="radio" name="type" value="lost" checked={form.type === 'lost'} onChange={update} disabled={editing} /> I lost an item</label>
-          <label className="choice"><input type="radio" name="type" value="found" checked={form.type === 'found'} onChange={update} disabled={editing} /> I found an item</label>
+          <div className="choice-row">
+            <label className={`choice-card ${form.type === 'lost' ? 'selected' : ''}`}><input type="radio" name="type" value="lost" checked={form.type === 'lost'} onChange={update} disabled={editing} /> I lost an item</label>
+            <label className={`choice-card ${form.type === 'found' ? 'selected' : ''}`}><input type="radio" name="type" value="found" checked={form.type === 'found'} onChange={update} disabled={editing} /> I found an item</label>
+          </div>
         </fieldset>
 
-        <FormField id="title" label="Title" required value={form.title} onChange={update} error={errors.title} maxLength={120} />
-        <FormField id="category" label="Category" as="select" required value={form.category} onChange={update} error={errors.category}>
+        <FormField id="title" label="Title" icon={IconTag} required value={form.title} onChange={update} error={errors.title} maxLength={120} />
+        <FormField id="category" label="Category" icon={IconGrid} as="select" required value={form.category} onChange={update} error={errors.category}>
           <option value="">Choose a category</option>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </FormField>
@@ -98,10 +106,10 @@ export default function ReportForm() {
           </div>
         )}
 
-        <FormField id="event_date" label={form.type === 'found' ? 'Date found' : 'Date lost'} type="date" max={todayISO()} required value={form.event_date} onChange={update} error={errors.event_date} />
-        <FormField id="location" label="Campus location" as="select" required value={form.location} onChange={update} error={errors.location}>
+        <FormField id="event_date" label={form.type === 'found' ? 'Date found' : 'Date lost'} icon={IconCalendar} type="date" max={todayISO()} required value={form.event_date} onChange={update} error={errors.event_date} />
+        <FormField id="location" label="Campus location" icon={IconPin} as="select" required value={form.location} onChange={update} error={errors.location}>
           <option value="">Choose a location</option>
-          {LOCATIONS.map((l) => <option key={l}>{l}</option>)}
+          <LocationOptions />
         </FormField>
         <FormField id="photo_url" label="Photo web address" type="url" inputMode="url" value={form.photo_url} onChange={update} error={errors.photo_url}
           hint="Optional. Use a photo that does not show private details." />
@@ -114,5 +122,6 @@ export default function ReportForm() {
         </div>
       </form>
     </section>
+    </>
   );
 }

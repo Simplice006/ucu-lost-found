@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import FormField from '../components/FormField';
+import PageHeader from '../components/PageHeader';
+import { IconLock, IconMail, IconUser } from '../components/Icons';
 
 export default function Login() {
   const { login } = useAuth();
@@ -43,8 +45,9 @@ export default function Login() {
   }
 
   return (
-    <section className="card narrow">
-      <h1>Log in</h1>
+    <>
+      <PageHeader icon={IconUser} title="Welcome back" subtitle="Log in to report items and follow your claims." />
+    <section className="card narrow overlap">
       {formError && (
         <p role="alert" className="alert alert-error">
           {formError}
@@ -53,7 +56,9 @@ export default function Login() {
       <form onSubmit={handleSubmit} noValidate>
         <FormField
           id="email"
+          required
           label="Email address"
+          icon={IconMail}
           type="email"
           autoComplete="email"
           value={form.email}
@@ -62,7 +67,9 @@ export default function Login() {
         />
         <FormField
           id="password"
+          required
           label="Password"
+          icon={IconLock}
           type="password"
           autoComplete="current-password"
           value={form.password}
@@ -77,5 +84,6 @@ export default function Login() {
         New here? <Link to="/register">Create an account</Link>
       </p>
     </section>
+    </>
   );
 }
