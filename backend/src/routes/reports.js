@@ -8,7 +8,7 @@ const { CATEGORIES, LOCATIONS } = require('../constants');
 const router = express.Router();
 // PUBLIC columns only: private_details is never selected here.
 const PUBLIC = 'id, user_id, type, title, category, description, event_date, location, photo_url, status, created_at';
-const today = () => {
+const today = () => { 
   const parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Africa/Kampala',
     year: 'numeric',
