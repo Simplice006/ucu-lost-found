@@ -8,7 +8,20 @@ const { CATEGORIES, LOCATIONS } = require('../constants');
 const router = express.Router();
 // PUBLIC columns only: private_details is never selected here.
 const PUBLIC = 'id, user_id, type, title, category, description, event_date, location, photo_url, status, created_at';
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Kampala',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(
+    parts.map(part => [part.type, part.value])
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+};
 
 const rules = [
   body('type').isIn(['lost', 'found']).withMessage('Choose whether the item was lost or found.'),
