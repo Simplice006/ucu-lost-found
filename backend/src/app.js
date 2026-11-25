@@ -11,10 +11,27 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Render (and most hosts) sit behind a proxy: needed so the rate limiter sees the real client IP.
+app.set('trust proxy', 1);
+
 app.use(helmet());
+// Allowed origins come from CORS_ORIGIN (comma-separated). Outside production, any localhost /
+// 127.0.0.1 port is also accepted, because Vite moves to 5174, 5175... when 5173 is already taken.
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+const isLocalDev = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
 app.use(
   cors({
-    origin: (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map((s) => s.trim()),
+    origin(origin, callback) {
+      // No Origin header = curl, Postman or same-origin requests: nothing to block.
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (process.env.NODE_ENV !== 'production' && isLocalDev(origin)) return callback(null, true);
+      return callback(null, false);
+    },
   })
 );
 app.use(express.json({ limit: '100kb' }));
