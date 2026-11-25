@@ -51,13 +51,16 @@ router.post('/claims/:id/approve', [idRule, reasonRule], validate, (req, res, ne
 router.post('/claims/:id/reject', [idRule, reasonRule], validate, (req, res, next) => decide(req, res, next, 'rejected'));
 
 router.post('/claims/:id/confirm-return', [idRule], validate, async (req, res, next) => {
-  const conn = await pool.getConnection();
+  let conn;
   try {
-    const claim = await loadClaim(req.params.id);
-    if (!claim) return res.status(404).json({ error: 'This claim does not exist.' });
-    if (claim.status !== 'approved') return res.status(409).json({ error: 'Only an approved claim can be confirmed as collected.' });
-    if (claim.returned_at) return res.status(409).json({ error: 'This return was already confirmed.' });
+    conn = await pool.getConnection();
     await conn.beginTransaction();
+    const [rows] = await conn.query(
+      'SELECT id, report_id, status, returned_at FROM claims WHERE id = ? FOR UPDATE', [req.params.id]);
+    const claim = rows[0];
+    if (!claim) { await conn.rollback(); return res.status(404).json({ error: 'This claim does not exist.' }); }
+    if (claim.status !== 'approved') { await conn.rollback(); return res.status(409).json({ error: 'Only an approved claim can be confirmed as collected.' }); }
+    if (claim.returned_at) { await conn.rollback(); return res.status(409).json({ error: 'This return was already confirmed.' }); }
     await conn.query('UPDATE claims SET returned_at = NOW() WHERE id = ?', [claim.id]);
     await conn.query("UPDATE reports SET status = 'returned' WHERE id = ?", [claim.report_id]);
     await conn.query(
@@ -65,7 +68,12 @@ router.post('/claims/:id/confirm-return', [idRule], validate, async (req, res, n
       [req.user.id, claim.report_id]);
     await conn.commit();
     res.json({ message: 'Return confirmed.' });
-  } catch (err) { await conn.rollback(); next(err); } finally { conn.release(); }
+  } catch (err) {
+    if (conn) await conn.rollback();
+    next(err);
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
 module.exports = router;
