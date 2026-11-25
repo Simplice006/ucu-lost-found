@@ -11,6 +11,9 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Render (and most hosts) sit behind a proxy: needed so the rate limiter sees the real client IP.
+app.set('trust proxy', 1);
+
 app.use(helmet());
 // Allowed origins come from CORS_ORIGIN (comma-separated). Outside production, any localhost /
 // 127.0.0.1 port is also accepted, because Vite moves to 5174, 5175... when 5173 is already taken.
