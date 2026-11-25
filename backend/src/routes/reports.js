@@ -8,7 +8,7 @@ const { CATEGORIES, LOCATIONS } = require('../constants');
 const router = express.Router();
 // PUBLIC columns only: private_details is never selected here.
 const PUBLIC = 'id, user_id, type, title, category, description, event_date, location, photo_url, status, created_at';
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 const rules = [
   body('type').isIn(['lost', 'found']).withMessage('Choose whether the item was lost or found.'),
